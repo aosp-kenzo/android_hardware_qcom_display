@@ -38,6 +38,8 @@ ifeq ($(VSYNC_EVENT_PHASE_OFFSET_NS),)
     LOCAL_CFLAGS += -DDYNAMIC_FPS
 endif
 
+LOCAL_CFLAGS += -DGPU_PERF_MODE
+
 LOCAL_ADDITIONAL_DEPENDENCIES := $(common_deps)
 LOCAL_SRC_FILES               := hwc.cpp          \
                                  hwc_utils.cpp    \

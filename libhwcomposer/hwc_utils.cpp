@@ -57,7 +57,7 @@ using namespace overlay::utils;
 using namespace qQdcm;
 namespace ovutils = overlay::utils;
 
-#ifdef QTI_BSP
+#ifdef GPU_PERF_MODE
 
 #define EGL_GPU_HINT_1        0x32D0
 #define EGL_GPU_HINT_2        0x32D1
@@ -450,7 +450,7 @@ int initContext(hwc_context_t *ctx)
     ctx->mBootAnimCompleted = false;
 
     // Initialize gpu perfomance hint related parameters
-#ifdef QTI_BSP
+#ifdef GPU_PERF_MODE
     ctx->mEglLib = NULL;
     ctx->mpfn_eglGpuPerfHintQCOM = NULL;
     ctx->mpfn_eglGetCurrentDisplay = NULL;
@@ -554,7 +554,7 @@ void closeContext(hwc_context_t *ctx)
         delete ctx->mQService;
         ctx->mQService = NULL;
     }
-#ifdef QTI_BSP
+#ifdef GPU_PERF_MODE
     ctx->mpfn_eglGpuPerfHintQCOM = NULL;
     ctx->mpfn_eglGetCurrentDisplay = NULL;
     ctx->mpfn_eglGetCurrentContext = NULL;
@@ -2871,7 +2871,7 @@ bool isGLESComp(hwc_context_t *ctx,
 }
 
 void setGPUHint(hwc_context_t* ctx, hwc_display_contents_1_t* list) {
-#ifdef QTI_BSP
+#ifdef GPU_PERF_MODE
     struct gpu_hint_info *gpuHint = &ctx->mGPUHintInfo;
     if(!gpuHint->mGpuPerfModeEnable || !ctx || !list)
         return;
@@ -3396,7 +3396,7 @@ bool displaySupports3D(hwc_context_t* ctx, int dpy) {
 
 bool loadEglLib(hwc_context_t* ctx) {
     bool success = false;
-#ifdef QTI_BSP
+#ifdef GPU_PERF_MODE
     dlerror();
 
     ctx->mEglLib = dlopen("libEGL_adreno.so", RTLD_NOW);

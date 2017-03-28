@@ -736,7 +736,7 @@ struct hwc_context_t {
     bool mPanelResetStatus;
     // number of active Displays
     int numActiveDisplays;
-#ifdef QTI_BSP
+#ifdef GPU_PERF_MODE
     void *mEglLib;
     EGLBoolean (*mpfn_eglGpuPerfHintQCOM)(EGLDisplay, EGLContext, EGLint *);
     EGLDisplay (*mpfn_eglGetCurrentDisplay)();
