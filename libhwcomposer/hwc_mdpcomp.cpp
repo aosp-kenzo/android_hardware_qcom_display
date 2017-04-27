@@ -41,6 +41,7 @@ namespace qhwc {
 IdleInvalidator *MDPComp::sIdleInvalidator = NULL;
 bool MDPComp::sIdleFallBack = false;
 bool MDPComp::sHandleTimeout = false;
+bool MDPComp::sHandleDfps = false;
 bool MDPComp::sDebugLogs = false;
 bool MDPComp::sEnabled = false;
 bool MDPComp::sEnableMixedMode = true;
@@ -238,6 +239,7 @@ void MDPComp::reset(hwc_context_t *ctx) {
 
 void MDPComp::reset() {
     sHandleTimeout = false;
+    sHandleDfps = !sIdleFallBack;
     mPrevModeOn = mModeOn;
     mModeOn = false;
 }
@@ -260,27 +262,11 @@ void MDPComp::timeout_handler(void *udata) {
 
     if(!sHandleTimeout) {
         ALOGD_IF(isDebug(), "%s:Do not handle this timeout", __FUNCTION__);
-        if(qdutils::MDPVersion::getInstance().isDynFpsSupported() &&
-           ctx->mUseMetaDataRefreshRate) {
-            MDPVersion& mdpHw = MDPVersion::getInstance();
-            int dpy = HWC_DISPLAY_PRIMARY;
-            /* Even in cases, where we wouldnot like to trigger new frame update
-               (for ex: if previous frame happens to be single pipe mdpcomp, etc),
-               refresh-rate should be set to the minfps supported by panel as
-               part of idle-fallback */
-            uint32_t refreshRate = mdpHw.getMinFpsSupported();
-            readRefreshRate(ctx, dpy);
-            if((refreshRate != ctx->dpyAttr[dpy].dynRefreshRate) &&
-               (ctx->listStats[dpy].yuvCount == 0) && ctx->dpyAttr[dpy].isActive) {
-                setRefreshRate(ctx, dpy, refreshRate);
-                if(!Overlay::displayCommit(ctx->dpyAttr[dpy].fd)) {
-                    ALOGE("%s: displayCommit failed for %d when setting dynfps",
-                          __FUNCTION__, dpy);
-                }
-            }
+        if(!qdutils::MDPVersion::getInstance().isDynFpsSupported() ||
+           !ctx->mUseMetaDataRefreshRate || !sHandleDfps) {
+            ctx->mDrawLock.unlock();
+            return;
         }
-        ctx->mDrawLock.unlock();
-        return;
     }
 
     sIdleFallBack = true;
@@ -2200,10 +2186,7 @@ void MDPComp::setDynRefreshRate(hwc_context_t *ctx, hwc_display_contents_1_t* li
                                         ctx->mUseMetaDataRefreshRate) {
         uint32_t refreshRate = ctx->dpyAttr[mDpy].refreshRate;
         MDPVersion& mdpHw = MDPVersion::getInstance();
-        if(sIdleFallBack && !ctx->listStats[mDpy].secureUI &&
-                !ctx->listStats[mDpy].secureRGBCount &&
-                (ctx->listStats[mDpy].numAppLayers > 1) &&
-                (ctx->listStats[mDpy].yuvCount == 0)) {
+        if(sIdleFallBack && (ctx->listStats[mDpy].yuvCount == 0)) {
             //Set minimum panel refresh rate during idle timeout
             refreshRate = mdpHw.getMinFpsSupported();
         } else if(onlyVideosUpdating(ctx, list)) {
