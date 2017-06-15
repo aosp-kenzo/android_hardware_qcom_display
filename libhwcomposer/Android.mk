@@ -8,7 +8,8 @@ LOCAL_PROPRIETARY_MODULE      := true
 LOCAL_MODULE_TAGS             := optional
 LOCAL_C_INCLUDES              := $(common_includes) $(kernel_includes) \
                                  $(TOP)/external/skia/include/core \
-                                 $(TOP)/external/skia/include/images
+                                 $(TOP)/external/skia/include/images \
+                                 frameworks/native/libs/arect/include
 
 ifeq ($(strip $(TARGET_USES_QCOM_DISPLAY_PP)),true)
 LOCAL_C_INCLUDES              += $(TARGET_OUT_HEADERS)/qdcm/inc \
