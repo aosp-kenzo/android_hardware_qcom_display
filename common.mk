@@ -28,6 +28,10 @@ ifeq ($(call is-board-platform-in-list, $(MASTER_SIDE_CP_TARGET_LIST)), true)
     common_flags += -DMASTER_SIDE_CP
 endif
 
+ifeq ($(DISPLAY_DEBUG_SWAPINTERVAL),true)
+    common_flags += -DDEBUG_SWAPINTERVAL
+endif
+
 common_deps  :=
 kernel_includes :=
 

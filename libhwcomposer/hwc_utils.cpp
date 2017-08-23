@@ -1929,11 +1929,13 @@ int hwc_sync(hwc_context_t *ctx, hwc_display_contents_1_t* list, int dpy,
         isExtAnimating = ctx->listStats[dpy].isDisplayAnimating;
 
     bool swapzero = false;
+#ifdef DEBUG_SWAPINTERVAL
     char property[PROPERTY_VALUE_MAX];
     if(property_get("debug.egl.swapinterval", property, "1") > 0) {
         if(atoi(property) == 0)
             swapzero = true;
     }
+#endif
 
     if(swapzero) {
         hwc_sync_sz(ctx, list, dpy);
