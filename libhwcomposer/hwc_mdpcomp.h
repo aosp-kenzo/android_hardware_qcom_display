@@ -271,7 +271,6 @@ protected:
     static bool sIdleFallBack;
     /* Handles the timeout event from kernel, if the value is set to true */
     static bool sHandleTimeout;
-    static bool sHandleDfps;
     static int sMaxPipesPerMixer;
     static bool sSrcSplitEnabled;
     static IdleInvalidator *sIdleInvalidator;
